@@ -30,10 +30,10 @@ function App() {
     setStage('loading');
 
     try {
-      const response = await axios.post('http://127.0.0.1:8000/analyze/', {
-        pair: coin,
-        strategy_key: selectedStrategy,
-      });
+      const response = await axios.post('https://max-nitro-anv15-41.tailcbcc1d.ts.net/analyze/', {
+  pair: coin,
+  strategy_key: selectedStrategy,
+});
       setResult(response.data);
       setStage('result');
     } catch (err) {
