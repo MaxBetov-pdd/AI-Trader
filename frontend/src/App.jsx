@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import axios from 'axios';
-import { AnimatePresence, motion } from 'framer-motion'; // <-- ИСПРАВЛЕНИЕ ЗДЕСЬ
+import { AnimatePresence, motion } from 'framer-motion';
 import CoinInput from './components/CoinInput';
 import StrategySelection from './components/StrategySelection';
 import AnalysisResult from './components/AnalysisResult';
@@ -16,6 +16,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [stage, setStage] = useState('coinInput'); // 'coinInput', 'strategySelection', 'loading', 'result', 'error'
+  const [queueSize, setQueueSize] = useState(0); // <-- Состояние для хранения размера очереди
 
   const handleCoinSubmit = (selectedCoin) => {
     setCoin(selectedCoin);
@@ -30,10 +31,15 @@ function App() {
     setStage('loading');
 
     try {
+      // 1. Сначала получаем текущий размер очереди
+      const queueResponse = await axios.get('https://max-nitro-anv15-41.tailcbcc1d.ts.net/analyses/active');
+      setQueueSize(queueResponse.data.active_count);
+      
+      // 2. Затем отправляем наш запрос на анализ
       const response = await axios.post('https://max-nitro-anv15-41.tailcbcc1d.ts.net/analyze/', {
-  pair: coin,
-  strategy_key: selectedStrategy,
-});
+        pair: coin,
+        strategy_key: selectedStrategy,
+      });
       setResult(response.data);
       setStage('result');
     } catch (err) {
@@ -71,7 +77,7 @@ function App() {
           {stage === 'strategySelection' && (
             <StrategySelection key="strategySelection" onStrategySelect={handleStrategySelect} coin={coin} />
           )}
-          {stage === 'loading' && <LoadingState key="loading" message="Анализ запущен..." />}
+          {stage === 'loading' && <LoadingState key="loading" queueSize={queueSize} />}
           {stage === 'result' && (
             <motion.div
               key="result"
