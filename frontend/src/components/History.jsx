@@ -1,9 +1,9 @@
 // frontend/src/components/History.jsx
 import { useState, useEffect } from 'react';
+import axios from 'axios'; // Просто импортируем стандартный axios
 import HistoryCard from './HistoryCard';
 import AnalysisResult from './AnalysisResult';
 import { AnimatePresence, motion } from 'framer-motion';
-import { api } from '../App'; // <-- Импортируем единый экземпляр API
 
 const History = () => {
     const [history, setHistory] = useState([]);
@@ -14,8 +14,8 @@ const History = () => {
     useEffect(() => {
         const fetchHistory = async () => {
             try {
-                // Теперь мы используем общий, уже настроенный 'api'
-                const response = await api.get('/history');
+                // Используем axios напрямую. Перехватчик добавит токен.
+                const response = await axios.get('/history');
                 setHistory(response.data);
             } catch (err) {
                 setError('Не удалось загрузить историю.');
@@ -25,7 +25,7 @@ const History = () => {
         };
 
         fetchHistory();
-    }, []);
+    }, []); // Пустой массив зависимостей здесь теперь безопасен
 
     if (loading) return <div style={{textAlign: 'center', marginTop: '2rem', color: '#a0a0a0'}}>Загрузка истории...</div>;
     if (error) return <div className="error">{error}</div>;

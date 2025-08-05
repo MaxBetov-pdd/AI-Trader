@@ -10,10 +10,24 @@ import Login from './components/Login';
 import History from './components/History';
 import './App.css';
 
-// Создаем единый экземпляр axios для всего приложения
-export const api = axios.create({
-  baseURL: 'https://max-nitro-anv15-41.tailcbcc1d.ts.net',
+// --- Глобальная настройка Axios ---
+// Устанавливаем базовый URL
+axios.defaults.baseURL = 'https://max-nitro-anv15-41.tailcbcc1d.ts.net';
+
+// Добавляем "перехватчик" запросов. Эта функция будет срабатывать
+// ПЕРЕД КАЖДЫМ запросом, отправленным через axios.
+axios.interceptors.request.use(config => {
+  const token = localStorage.getItem('token');
+  // Если токен есть, добавляем его в заголовок Authorization
+  if (token && token !== 'null') {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+}, error => {
+  // В случае ошибки просто пробрасываем ее дальше
+  return Promise.reject(error);
 });
+
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem('token'));
@@ -25,24 +39,24 @@ function App() {
   const [queueSize, setQueueSize] = useState(0);
 
   useEffect(() => {
-    // Эта функция теперь будет вызываться при каждом изменении токена
-    if (token && token !== 'null') {
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      localStorage.setItem('token', token);
+    // Эта функция теперь просто синхронизирует состояние с localStorage
+    const storedToken = localStorage.getItem('token');
+    if (storedToken && storedToken !== 'null') {
+      setToken(storedToken);
     } else {
-      // Если токен невалидный или отсутствует, очищаем всё
-      delete api.defaults.headers.common['Authorization'];
       localStorage.removeItem('token');
-      setToken(null); // Принудительно сбрасываем состояние, чтобы вызвать ре-рендер
+      setToken(null);
     }
-  }, [token]);
+  }, []);
 
   const handleLoginSuccess = (newToken) => {
+    localStorage.setItem('token', newToken);
     setToken(newToken);
   };
 
   const handleLogout = () => {
-    setToken(null); // Это вызовет useEffect, который всё почистит
+    localStorage.removeItem('token');
+    setToken(null);
   };
   
   const handleCoinSubmit = (selectedCoin) => {
@@ -57,10 +71,10 @@ function App() {
     setStage('loading');
 
     try {
-      const queueResponse = await api.get('/analyses/active');
+      const queueResponse = await axios.get('/analyses/active');
       setQueueSize(queueResponse.data.active_count);
       
-      const response = await api.post('/analyze/', {
+      const response = await axios.post('/analyze/', {
         pair: coin,
         strategy_key: selectedStrategy,
       });
@@ -91,9 +105,7 @@ function App() {
     setError('');
   };
 
-  // Более надежная проверка. Страница логина покажется,
-  // если токен отсутствует, равен null или является строкой "null".
-  if (!token || token === 'null') {
+  if (!token) {
     return <Login onLoginSuccess={handleLoginSuccess} />;
   }
   
