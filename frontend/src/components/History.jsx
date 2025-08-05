@@ -1,23 +1,20 @@
+// frontend/src/components/History.jsx
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import HistoryCard from './HistoryCard';
 import AnalysisResult from './AnalysisResult';
 import { AnimatePresence, motion } from 'framer-motion';
+import { api } from '../App'; // <-- Импортируем единый экземпляр API
 
 const History = () => {
     const [history, setHistory] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [selectedSignal, setSelectedSignal] = useState(null);
-    
-    const api = axios.create({
-        baseURL: 'https://max-nitro-anv15-41.tailcbcc1d.ts.net',
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-    });
 
     useEffect(() => {
         const fetchHistory = async () => {
             try {
+                // Теперь мы используем общий, уже настроенный 'api'
                 const response = await api.get('/history');
                 setHistory(response.data);
             } catch (err) {
@@ -30,7 +27,7 @@ const History = () => {
         fetchHistory();
     }, []);
 
-    if (loading) return <div>Загрузка истории...</div>;
+    if (loading) return <div style={{textAlign: 'center', marginTop: '2rem', color: '#a0a0a0'}}>Загрузка истории...</div>;
     if (error) return <div className="error">{error}</div>;
 
     return (
