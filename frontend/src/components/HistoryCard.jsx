@@ -1,8 +1,27 @@
+// frontend/src/components/HistoryCard.jsx
 import { motion } from 'framer-motion';
+
+// Функция для получения стилей статуса
+const getStatusBadge = (status) => {
+    switch (status) {
+        case 'take_profit_hit':
+            return { text: '✅ Тейк-профит', color: '#00e676' };
+        case 'stop_loss_hit':
+            return { text: '🛡️ Стоп-лосс', color: '#ff5252' };
+        case 'activated':
+            return { text: '🔥 В рынке', color: '#82aaff' };
+        case 'expired':
+            return { text: '⌛ Истек', color: '#a0a0a0' };
+        case 'active':
+        default:
+            return { text: '⏳ Ожидает', color: '#ffeb3b' };
+    }
+};
 
 const HistoryCard = ({ signal, onCardClick }) => {
     const isLong = signal.direction === 'Long';
     const directionColor = isLong ? '#00e676' : '#ff5252';
+    const statusBadge = getStatusBadge(signal.status);
 
     return (
         <motion.div
@@ -24,6 +43,17 @@ const HistoryCard = ({ signal, onCardClick }) => {
                 <div style={{ color: directionColor, fontSize: '0.9rem', textTransform: 'uppercase' }}>
                     {signal.direction}
                 </div>
+            </div>
+            {/* НОВЫЙ БЛОК СТАТУСА */}
+            <div style={{
+                backgroundColor: 'rgba(0,0,0,0.2)',
+                color: statusBadge.color,
+                padding: '0.25rem 0.6rem',
+                borderRadius: '12px',
+                fontSize: '0.85rem',
+                fontWeight: 'bold',
+            }}>
+                {statusBadge.text}
             </div>
             <div style={{ textAlign: 'right', fontSize: '0.9rem', color: '#a0a0a0' }}>
                 <div>Вход: <span style={{ color: '#e0e0e0', fontWeight: '500' }}>{signal.entry_price}</span></div>
