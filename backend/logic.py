@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+# Полное содержимое файла backend/logic.py (с исправлением для Matplotlib)
+
+import matplotlib
+matplotlib.use('Agg') # <-- ВАЖНОЕ ИСПРАВЛЕНИЕ: говорим Matplotlib не использовать GUI
+
 import os
 import json
 import pandas as pd
@@ -10,19 +15,18 @@ from dotenv import load_dotenv
 from rich.console import Console
 
 # --- НАСТРОЙКА ---
-# Загрузка переменных окружения и базовая конфигурация
+# (остальной код остается без изменений)
 load_dotenv()
 try:
     genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
     exchange = ccxt.binance()
-    console = Console() # Мы все еще можем использовать ее для логов на сервере
+    console = Console()
 except Exception as e:
     print(f"❌ Ошибка конфигурации API: {e}")
     exit()
 
-# <--- Сюда скопируйте все ваши ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ без изменений --->
-# calculate_rsi, calculate_bbands, calculate_atr, calculate_adx
-
+# <--- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ --->
+# (Этот блок остается без изменений)
 def calculate_rsi(series: pd.Series, length: int = 14) -> pd.Series:
     delta = series.diff()
     gain = delta.where(delta > 0, 0)
@@ -60,12 +64,14 @@ def calculate_adx(df, length=14):
     df[f'ADX_{length}'] = adx
     return df
 
-
-# <--- Сюда скопируйте все ваши ОСНОВНЫЕ ФУНКЦИИ с небольшими изменениями --->
-# fetch_and_plot, analyze_with_gemini
-
+# <--- ОСНОВНЫЕ ФУНКЦИИ --->
+# (Этот блок остается без изменений)
 def fetch_and_plot(symbol: str, timeframe: str, run_id: int) -> str:
     try:
+        # Добавим вывод текущей цены для отладки
+        ticker = exchange.fetch_ticker(symbol)
+        print(f"Текущая цена для {symbol}: {ticker['last']}")
+        
         ohlcv = exchange.fetch_ohlcv(symbol, timeframe=timeframe, limit=200)
         if len(ohlcv) < 50:
             console.print(f"⚠️  Недостаточно данных для {timeframe}, пропускаем график.")
@@ -79,7 +85,7 @@ def fetch_and_plot(symbol: str, timeframe: str, run_id: int) -> str:
         params["mode"] = "Trend" if latest_adx > 25 else "Flat/Range"
         df['RSI'] = calculate_rsi(df['close'], length=params["rsi_length"])
         df['BBU'], df['BBL'] = calculate_bbands(df['close'], length=params["bb_length"], std=params["bb_std"])
-        # Сохраняем графики во временную папку, которую можно периодически чистить
+        
         os.makedirs("temp_charts", exist_ok=True)
         filepath = f"temp_charts/chart_{symbol.replace('/', '')}_{timeframe}_{run_id}.png"
         rsi_title = f"RSI ({params['rsi_length']}) - {params['mode']} Mode"
@@ -118,7 +124,7 @@ def analyze_with_gemini(symbol: str, image_paths: list, run_id: int, prompt_file
         console.print("❌ [bold red]Ни один файл с графиком не был успешно загружен. Анализ невозможен.[/bold red]")
         return None
 
-    model = genai.GenerativeModel('gemini-1.5-pro-latest') # Используем 1.5 Pro для лучшего результата
+    model = genai.GenerativeModel('gemini-2.5-pro')
     safety_settings = { 'HARM_CATEGORY_HARASSMENT': 'BLOCK_NONE', 'HARM_CATEGORY_HATE_SPEECH': 'BLOCK_NONE', 'HARM_CATEGORY_SEXUALLY_EXPLICIT': 'BLOCK_NONE', 'HARM_CATEGORY_DANGEROUS_CONTENT': 'BLOCK_NONE' }
     
     try:
@@ -132,14 +138,12 @@ def analyze_with_gemini(symbol: str, image_paths: list, run_id: int, prompt_file
              console.print(f"    [bold]Причина блокировки:[/bold] {response.prompt_feedback}")
         return None
     finally:
-        # Очищаем и загруженные файлы, и локальные
         for uploaded_file in uploaded_files:
             genai.delete_file(uploaded_file.name)
             console.print(f"  [dim]Удален временный файл Gemini: {uploaded_file.name}[/dim]")
         for p in image_paths:
             if p and os.path.exists(p): os.remove(p)
 
-# Новая главная функция, которая будет вызываться из API
 def run_full_analysis(pair: str, strategy_key: str):
     try:
         with open('config.json', 'r', encoding='utf-8') as f:
@@ -148,7 +152,7 @@ def run_full_analysis(pair: str, strategy_key: str):
     except (FileNotFoundError, KeyError):
         return {"error": f"Стратегия '{strategy_key}' или config.json не найдены."}
 
-    NUMBER_OF_RUNS = 3 # Логика консенсуса остается
+    NUMBER_OF_RUNS = 3
     results = []
     
     for i in range(1, NUMBER_OF_RUNS + 1):
@@ -159,7 +163,7 @@ def run_full_analysis(pair: str, strategy_key: str):
         valid_chart_paths = [p for p in chart_paths if p]
         if not valid_chart_paths:
             console.print(f"❌ (Прогон {i}) Не удалось создать ни одного графика. Анализ пропущен.")
-            continue # Переходим к следующему прогону
+            continue
 
         trade_idea = analyze_with_gemini(pair, valid_chart_paths, run_id=i, prompt_file=prompt_file)
         if trade_idea and trade_idea.get('direction') and trade_idea.get('direction').lower() != 'none':
@@ -172,12 +176,12 @@ def run_full_analysis(pair: str, strategy_key: str):
     direction_counts = Counter(directions)
     most_common_direction, count = direction_counts.most_common(1)[0]
     
-    if count >= 2: # Если есть консенсус (2 из 3)
+    if count >= 2:
         confident_result = next(r for r in results if r.get('direction') == most_common_direction)
         confident_result['status'] = 'success'
         confident_result['consensus'] = f"{count}/{len(results)}"
         return confident_result
-    else: # Если консенсуса нет
+    else:
         return {
             "status": "ambiguous", 
             "message": "Рыночная ситуация НЕОДНОЗНАЧНАЯ. ИИ дал противоречивые сигналы.",

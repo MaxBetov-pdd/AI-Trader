@@ -1,0 +1,12 @@
+fastapi
+uvicorn[standard]
+python-dotenv
+google-generativeai
+pandas
+mplfinance
+ccxt
+rich
+SQLAlchemy
+passlib[bcrypt]
+python-jose[cryptography]
+aiosqlite
