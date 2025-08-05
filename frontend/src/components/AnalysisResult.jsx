@@ -1,22 +1,17 @@
 /* frontend/src/components/AnalysisResult.css */
 
-.result-card, .info-card {
+.result-card {
   width: 100%;
-  max-width: 550px;
-  background-color: #1e1e1e;
   border-radius: 12px;
-  padding: 1.5rem 2rem;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
   border-left: 5px solid;
   color: #e0e0e0;
-  box-sizing: border-box; /* Гарантирует правильный расчет ширины */
+  box-sizing: border-box;
 }
 
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid #333;
 }
@@ -27,11 +22,12 @@
   font-weight: 600;
 }
 
-.direction-long, .direction-short {
-  font-size: 1.2rem;
+.direction-badge {
+  font-size: 1rem;
   font-weight: bold;
   padding: 0.3rem 0.8rem;
   border-radius: 20px;
+  flex-shrink: 0; /* Не позволяет элементу сжиматься */
 }
 
 .direction-long {
@@ -47,76 +43,56 @@
 .summary-text {
   font-style: italic;
   color: #a0a0a0;
-  margin-bottom: 1.5rem;
+  margin: 1.5rem 0;
   line-height: 1.6;
+  font-size: 0.95rem;
 }
 
 .trade-details {
-  display: grid;
-  gap: 1rem;
+  display: flex;
+  flex-direction: column; /* Всегда колонка */
+  gap: 1rem; /* Отступ между элементами списка */
 }
 
-/* На больших экранах все остается как есть */
+/* Стили по умолчанию (Mobile-First) */
 .detail-item {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.5rem 0;
+  flex-direction: column; /* Лейбл и значение друг под другом */
+  align-items: flex-start; /* Выравнивание по левому краю */
 }
 
 .label {
   font-weight: bold;
   color: #a0a0a0;
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem; /* Отступ под лейблом */
 }
 
 .value {
   font-weight: 500;
-  text-align: right;
+  font-size: 1.1rem;
 }
 
+/* Стили для разных типов значений */
 .value-entry { color: #82aaff; font-weight: bold; }
 .value-stoploss { color: #ff8a80; font-weight: bold; }
 .value-takeprofit { color: #b9f6ca; font-weight: bold; }
 .value-risk { color: #ffeb3b; }
 
-.info-card {
-  text-align: center;
-  border-color: #ffeb3b;
-}
-.info-card h2 {
-  color: #ffeb3b;
-  margin-top: 0;
-}
 
-
-/* ================================================= */
-/* === ФИНАЛЬНОЕ ИСПРАВЛЕНИЕ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ === */
-/* ================================================= */
-@media (max-width: 600px) {
-  .result-card, .info-card {
-    padding: 1.5rem 1rem; /* Уменьшаем боковые отступы */
-  }
-
-  .summary-text {
-    font-size: 0.95rem;
-  }
-
-  /* Заставляем элементы располагаться друг под другом */
+/* Адаптация для больших экранов (например, планшеты и десктопы) */
+@media (min-width: 480px) {
   .detail-item {
-    display: block; /* Отключаем flex, элементы станут блочными */
-    padding: 0.75rem 0;
-    border-bottom: 1px solid #2c2c2c; /* Добавим разделитель для красоты */
-  }
-  
-  .trade-details {
-    gap: 0; /* Убираем gap, так как теперь есть разделители */
+    flex-direction: row; /* Возвращаем лейбл и значение в одну строку */
+    justify-content: space-between;
+    align-items: center;
   }
 
-  /* Стили для значения, когда оно под лейблом */
+  .label {
+    margin-bottom: 0; /* Убираем нижний отступ у лейбла */
+  }
+
   .value {
-    display: block; /* Гарантируем, что значение будет на новой строке */
-    text-align: left; /* Выравниваем по левому краю */
-    margin-top: 0.25rem; /* Добавляем небольшой отступ сверху */
-    font-size: 1.1rem; /* Слегка увеличим для читаемости */
+     font-size: 1rem; /* Возвращаем стандартный размер шрифта */
   }
 }
