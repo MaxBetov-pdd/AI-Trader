@@ -9,7 +9,7 @@
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
   border-left: 5px solid;
   color: #e0e0e0;
-  box-sizing: border-box; /* Важное правило для правильного расчета ширины */
+  box-sizing: border-box; /* Гарантирует правильный расчет ширины */
 }
 
 .card-header {
@@ -36,12 +36,12 @@
 
 .direction-long {
   color: #1e1e1e;
-  background-color: #00e676; /* Яркий зеленый */
+  background-color: #00e676;
 }
 
 .direction-short {
   color: #1e1e1e;
-  background-color: #ff5252; /* Яркий красный */
+  background-color: #ff5252;
 }
 
 .summary-text {
@@ -56,6 +56,7 @@
   gap: 1rem;
 }
 
+/* На больших экранах все остается как есть */
 .detail-item {
   display: flex;
   justify-content: space-between;
@@ -66,36 +67,21 @@
 .label {
   font-weight: bold;
   color: #a0a0a0;
-  white-space: nowrap; /* Запрещаем перенос самого лейбла */
-  margin-right: 1rem;  /* Добавляем отступ справа */
 }
 
 .value {
   font-weight: 500;
   text-align: right;
-  word-break: break-all; /* Разрешаем перенос значения, если оно слишком длинное */
 }
 
-.value-entry {
-  color: #82aaff;
-  font-weight: bold;
-}
-.value-stoploss {
-  color: #ff8a80; /* Светло-красный */
-  font-weight: bold;
-}
-.value-takeprofit {
-  color: #b9f6ca; /* Светло-зеленый */
-  font-weight: bold;
-}
-.value-risk {
-  color: #ffeb3b; /* Желтый */
-}
+.value-entry { color: #82aaff; font-weight: bold; }
+.value-stoploss { color: #ff8a80; font-weight: bold; }
+.value-takeprofit { color: #b9f6ca; font-weight: bold; }
+.value-risk { color: #ffeb3b; }
 
-/* Стили для информационных карточек */
 .info-card {
   text-align: center;
-  border-color: #ffeb3b; /* Желтый */
+  border-color: #ffeb3b;
 }
 .info-card h2 {
   color: #ffeb3b;
@@ -103,27 +89,34 @@
 }
 
 
-/* --- КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ ДЛЯ МОБИЛЬНЫХ --- */
+/* ================================================= */
+/* === ФИНАЛЬНОЕ ИСПРАВЛЕНИЕ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ === */
+/* ================================================= */
 @media (max-width: 600px) {
   .result-card, .info-card {
-    padding: 1rem; /* Уменьшаем боковые отступы */
+    padding: 1.5rem 1rem; /* Уменьшаем боковые отступы */
   }
 
   .summary-text {
     font-size: 0.95rem;
   }
 
-  .card-header h3 {
-    font-size: 1.3rem;
+  /* Заставляем элементы располагаться друг под другом */
+  .detail-item {
+    display: block; /* Отключаем flex, элементы станут блочными */
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #2c2c2c; /* Добавим разделитель для красоты */
   }
   
-  .direction-long, .direction-short {
-    font-size: 1rem;
-    padding: 0.2rem 0.6rem;
+  .trade-details {
+    gap: 0; /* Убираем gap, так как теперь есть разделители */
   }
 
-  .detail-item {
-    /* Это позволит элементам переноситься, если им не хватает места */
-    flex-wrap: wrap; 
+  /* Стили для значения, когда оно под лейблом */
+  .value {
+    display: block; /* Гарантируем, что значение будет на новой строке */
+    text-align: left; /* Выравниваем по левому краю */
+    margin-top: 0.25rem; /* Добавляем небольшой отступ сверху */
+    font-size: 1.1rem; /* Слегка увеличим для читаемости */
   }
 }
