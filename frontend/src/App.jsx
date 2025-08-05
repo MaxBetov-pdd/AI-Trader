@@ -140,7 +140,7 @@ function App() {
           )}
         </AnimatePresence>
         
-        {stage === 'coinInput' && <History />}
+        {stage === 'coinInput' && <History key={token} />}
 
       </div>
     </div>
