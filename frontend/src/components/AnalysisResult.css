@@ -5,10 +5,11 @@
   max-width: 550px;
   background-color: #1e1e1e;
   border-radius: 12px;
-  padding: 1.5rem 2rem;
+  padding: 1.5rem 1rem;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
   border-left: 5px solid;
   color: #e0e0e0;
+  box-sizing: border-box;
 }
 
 .card-header {
@@ -65,11 +66,14 @@
 .label {
   font-weight: bold;
   color: #a0a0a0;
+  white-space: nowrap;
+  margin-right: 1rem;
 }
 
 .value {
   font-weight: 500;
   text-align: right;
+  word-break: break-all;
 }
 
 .value-entry {
@@ -77,23 +81,28 @@
   font-weight: bold;
 }
 .value-stoploss {
-  color: #ff8a80; /* Светло-красный */
+  color: #ff8a80;
   font-weight: bold;
 }
 .value-takeprofit {
-  color: #b9f6ca; /* Светло-зеленый */
+  color: #b9f6ca;
   font-weight: bold;
 }
 .value-risk {
-  color: #ffeb3b; /* Желтый */
+  color: #ffeb3b;
 }
 
-/* Стили для информационных карточек (нет сигнала / неоднозначно) */
 .info-card {
   text-align: center;
-  border-color: #ffeb3b; /* Желтый */
+  border-color: #ffeb3b;
 }
 .info-card h2 {
   color: #ffeb3b;
   margin-top: 0;
+}
+
+@media (max-width: 600px) {
+  .detail-item {
+    flex-wrap: wrap;
+  }
 }

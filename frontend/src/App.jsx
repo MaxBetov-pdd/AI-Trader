@@ -10,17 +10,24 @@ import Login from './components/Login';
 import History from './components/History';
 import './App.css';
 
+// --- Глобальная настройка Axios ---
+// Устанавливаем базовый URL
 axios.defaults.baseURL = 'https://max-nitro-anv15-41.tailcbcc1d.ts.net';
 
+// Добавляем "перехватчик" запросов. Эта функция будет срабатывать
+// ПЕРЕД КАЖДЫМ запросом, отправленным через axios.
 axios.interceptors.request.use(config => {
   const token = localStorage.getItem('token');
+  // Если токен есть, добавляем его в заголовок Authorization
   if (token && token !== 'null') {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 }, error => {
+  // В случае ошибки просто пробрасываем ее дальше
   return Promise.reject(error);
 });
+
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem('token'));
@@ -32,6 +39,7 @@ function App() {
   const [queueSize, setQueueSize] = useState(0);
 
   useEffect(() => {
+    // Эта функция теперь просто синхронизирует состояние с localStorage
     const storedToken = localStorage.getItem('token');
     if (storedToken && storedToken !== 'null') {
       setToken(storedToken);
@@ -102,7 +110,6 @@ function App() {
   }
   
   return (
-    // ИЗМЕНЕНИЕ ЗДЕСЬ: отступы теперь 1rem, что лучше для мобильных
     <div className="fullscreen-container" style={{ padding: '1rem' }}>
       <div className="app-container">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
