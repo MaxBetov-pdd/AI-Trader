@@ -32,7 +32,6 @@ const StrategySelection = ({ onStrategySelect, coin }) => {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '2rem',
       }}
     >
       <motion.h1
@@ -43,7 +42,8 @@ const StrategySelection = ({ onStrategySelect, coin }) => {
       >
         Выберите стратегию для <span style={{ color: '#64ffda' }}>{coin}</span>
       </motion.h1>
-      <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+      {/* ИЗМЕНЕНИЕ ЗДЕСЬ: flexDirection становится column на маленьких экранах */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
         {strategies.map((strat, index) => (
           <motion.div
             key={strat.key}
@@ -57,7 +57,8 @@ const StrategySelection = ({ onStrategySelect, coin }) => {
               color: '#e0e0e0',
               borderRadius: '8px',
               padding: '2rem',
-              width: '300px',
+              width: '100%', // <-- ИЗМЕНЕНИЕ ЗДЕСЬ: карточка занимает всю доступную ширину
+              maxWidth: '350px', // <-- ИЗМЕНЕНИЕ ЗДЕСЬ: но не больше этого значения
               cursor: 'pointer',
               boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
               textAlign: 'center',
@@ -65,7 +66,7 @@ const StrategySelection = ({ onStrategySelect, coin }) => {
               flexDirection: 'column',
               justifyContent: 'space-between'
             }}
-            whileHover={{ scale: 1.05, y: -5, backgroundColor: '#2c2c2c' }}
+            whileHover={{ scale: 1.02, y: -5, backgroundColor: '#2c2c2c' }}
           >
             <div>
               <h2 style={{ color: '#64ffda', marginBottom: '1rem' }}>{strat.name}</h2>
@@ -73,7 +74,7 @@ const StrategySelection = ({ onStrategySelect, coin }) => {
                 {strat.description}
               </p>
             </div>
-            <motion.button // <-- ИСПРАВЛЕНИЕ ЗДЕСЬ
+            <motion.button
               style={{
                 padding: '0.8rem 1.5rem',
                 borderRadius: '5px',
