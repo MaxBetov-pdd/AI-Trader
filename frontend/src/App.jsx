@@ -102,11 +102,11 @@ function App() {
   }
   
   return (
-    // ИЗМЕНЕНИЕ ЗДЕСЬ: уменьшаем padding для всего контейнера
+    // ИЗМЕНЕНИЕ ЗДЕСЬ: отступы теперь 1rem, что лучше для мобильных
     <div className="fullscreen-container" style={{ padding: '1rem' }}>
       <div className="app-container">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-            <h1 style={{margin: 0}}>AI-Trader</h1>
+            <h1 style={{margin: 0, fontSize: '1.5rem'}}>AI-Trader</h1>
             <button onClick={handleLogout} style={{height: 'fit-content'}}>Выйти</button>
         </div>
 
