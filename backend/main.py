@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# backend/main.py
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
@@ -36,16 +36,17 @@ class AnalysisResultModel(BaseModel):
     risk_reward_ratio: str
     invalidation_hours: int
     consensus: str
+    status: str
 
 class AnalysisRequest(BaseModel):
     pair: str
     strategy_key: str
-    
-# --- Создание экземпляра FastAPI ---
+
+# --- СОЗДАНИЕ ПРИЛОЖЕНИЯ (ПЕРЕД ИСПОЛЬЗОВАНИЕМ) ---
 app = FastAPI(
     title="AI-Trader API",
     description="API для анализа торговых пар с помощью AI.",
-    version="14.0" # Версия с асинхронной БД
+    version="14.1" # Исправленная версия
 )
 
 # --- Глобальные переменные и CORS ---
@@ -60,7 +61,6 @@ app.add_middleware(
 @app.on_event("startup")
 async def startup():
     async with async_engine.begin() as conn:
-        # Создаем таблицы при запуске
         await conn.run_sync(metadata.create_all)
 
 # --- Эндпоинты ---
@@ -78,7 +78,6 @@ async def login_for_access_token(
         insert_query = users.insert().values(username=form_data.username, hashed_password=hashed_password)
         await db.execute(insert_query)
         await db.commit()
-        # Повторно получаем пользователя после создания
         result = await db.execute(query)
         user_in_db_tuple = result.fetchone()
     
@@ -115,6 +114,7 @@ async def analyze_pair(
             raise HTTPException(status_code=400, detail=result["error"])
         
         if result.get("status") == "success":
+            is_premium_signal = result.get("consensus") == "3/3" and result.get("entry_type") == "Limit"
             insert_query = analyses.insert().values(
                 user_id=current_user.id,
                 symbol=result["symbol"],
@@ -127,6 +127,7 @@ async def analyze_pair(
                 risk_reward_ratio=result["risk_reward_ratio"],
                 invalidation_hours=result["invalidation_hours"],
                 consensus=result.get("consensus", "N/A"),
+                is_high_quality=is_premium_signal,
             )
             await db.execute(insert_query)
             await db.commit()
@@ -147,5 +148,4 @@ async def get_user_history(
     query = select(analyses).where(analyses.c.user_id == current_user.id).order_by(analyses.c.timestamp.desc())
     result = await db.execute(query)
     history_records = result.fetchall()
-    # Преобразуем кортежи в словари для соответствия модели
     return [record._asdict() for record in history_records]
