@@ -106,3 +106,39 @@
     flex-wrap: wrap;
   }
 }
+
+/* ... (ваши старые стили) ... */
+
+.meta-details {
+  padding: 1rem 0;
+  margin-bottom: 1rem;
+  border-top: 1px solid #333;
+  border-bottom: 1px solid #333;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.value-consensus, .value-confidence {
+  font-weight: bold;
+}
+
+.charts-container {
+  margin-top: 2rem;
+  text-align: center;
+  border-top: 1px solid #444;
+  padding-top: 1rem;
+}
+
+.charts-container h4 {
+  margin-bottom: 1rem;
+  color: #a0a0a0;
+}
+
+.charts-container img {
+  width: 100%;
+  max-width: 100%;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  border: 1px solid #444;
+}
