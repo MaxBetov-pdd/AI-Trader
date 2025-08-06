@@ -6,7 +6,7 @@ const LoadingState = ({ queueSize }) => {
   // Рассчитываем время ожидания по формуле (n+1) * 120
   // Если перед нами 0 человек (n=0), время будет 120с.
   // Если перед нами 1 человек (n=1), время будет 240с.
-  const estimatedWaitTime = (queueSize + 1) * 120;
+  const estimatedWaitTime = (queueSize + 1) * 180;
   
   const [countdown, setCountdown] = useState(estimatedWaitTime);
 
